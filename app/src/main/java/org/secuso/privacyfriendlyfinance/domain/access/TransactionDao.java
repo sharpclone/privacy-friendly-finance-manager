@@ -86,6 +86,22 @@ public abstract class TransactionDao extends AbstractDao<Transaction> {
 
 
     /*
+     * T R A N S F E R S
+     */
+    @Query("SELECT * FROM Tranzaction WHERE transferId=:transferId ORDER BY id ASC")
+    public abstract List<Transaction> getByTransferIdSync(long transferId);
+
+    /*
+     * H I S T O R Y _ ( for charts: raw rows ordered ascending by date )
+     */
+    @Query("SELECT * FROM Tranzaction WHERE accountId=:accountId ORDER BY date ASC, id ASC")
+    public abstract List<Transaction> getForAccountAscSync(long accountId);
+
+    @Query("SELECT * FROM Tranzaction WHERE categoryId=:categoryId ORDER BY date ASC, id ASC")
+    public abstract List<Transaction> getForCategoryAscSync(long categoryId);
+
+
+    /*
      * S U M S
      */
     @Query("SELECT SUM(COALESCE(categoryAmount, amount)) FROM Tranzaction WHERE categoryId=:categoryId AND COALESCE(categoryAmount, amount)>0")

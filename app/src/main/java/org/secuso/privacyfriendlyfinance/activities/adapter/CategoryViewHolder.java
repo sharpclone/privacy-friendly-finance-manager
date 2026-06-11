@@ -88,4 +88,13 @@ public class CategoryViewHolder extends AbstractRecyclerViewHolder {
             ivCategory.clearColorFilter();
         }
     }
+
+    public void setSelectedState(boolean selected) {
+        if (itemView instanceof androidx.cardview.widget.CardView) {
+            ((androidx.cardview.widget.CardView) itemView).setCardBackgroundColor(
+                    selected ? 0xFFDCEBFF : android.graphics.Color.WHITE);
+        } else {
+            itemView.setBackgroundColor(selected ? 0xFFDCEBFF : android.graphics.Color.TRANSPARENT);
+        }
+    }
 }

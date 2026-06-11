@@ -107,6 +107,10 @@
                 android:value="org.secuso.privacyfriendlyfinance.activities.AccountsActivity" />
         </activity>
         <activity
+            android:name=".activities.ChartActivity"
+            android:label="@string/chart_title"
+            android:theme="@style/AppTheme" />
+        <activity
             android:name=".activities.RepeatingTransactionsActivity"
             android:parentActivityName=".activities.TransactionsActivity"
             android:theme="@style/AppTheme.NoActionBar">

@@ -131,9 +131,20 @@ public class TransactionsActivity extends TransactionListActivity {
         }
 
         Id2Name<Category> id2Category = new Id2Name<>(FinanceDatabase.getInstance(getApplication()).categoryDao().getAllSynchron());
-        Id2Name<Account> id2Account = new Id2Name<>(FinanceDatabase.getInstance(getApplication()).accountDao().getAllSynchron());
+        List<Account> allAccounts = FinanceDatabase.getInstance(getApplication()).accountDao().getAllSynchron();
+        Id2Name<Account> id2Account = new Id2Name<>(allAccounts);
+
+        SharedPreferencesManager prefs = SharedPreferencesManager.get(getApplication());
+        java.util.Map<Long, String> accountCurrencyById = new java.util.HashMap<>();
+        for (Account account : allAccounts) {
+            if (account != null && account.getId() != null) {
+                accountCurrencyById.put(account.getId(), prefs.getAccountCurrencyCode(account.getId()));
+            }
+        }
+        String defaultCurrency = prefs.getDefaultCurrencyCode();
+
         try {
-            exporter = new CsvExporter(new FileWriter(file), id2Category, id2Account);
+            exporter = new CsvExporter(new FileWriter(file), id2Category, id2Account, accountCurrencyById, defaultCurrency);
             exporter.writeTransactions(transactionList);
         } catch (Exception e) {
             throw new RuntimeException(e);

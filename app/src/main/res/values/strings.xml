@@ -207,4 +207,51 @@
     <string name="info_nothing_to_export">No transactions available to export</string>
     <string name="currency_keep_current">Current: %1$s (choose only to change)</string>
 
+    <!-- Transfer between accounts -->
+    <string name="menu_new_transaction">New transaction</string>
+    <string name="menu_new_transfer">New transfer</string>
+    <string name="transfer_title">Transfer between accounts</string>
+    <string name="transfer_from">From account</string>
+    <string name="transfer_to">To account</string>
+    <string name="transfer_amount_sent">Amount taken from %1$s (%2$s)</string>
+    <string name="transfer_amount_received">Amount received into %1$s (%2$s)</string>
+    <string name="transfer_use_rate">Enter exchange rate instead of received amount</string>
+    <string name="transfer_rate_label">Rate (1 %1$s = ? %2$s)</string>
+    <string name="transfer_rate_field_hint">e.g. 1.08</string>
+    <string name="transfer_name_hint">Description (optional)</string>
+    <string name="transfer_default_name">Transfer</string>
+    <string name="transfer_error_same_account">Source and destination accounts must differ</string>
+    <string name="transfer_error_amount">Enter a valid amount</string>
+    <string name="transfer_error_no_accounts">At least two accounts are required for a transfer</string>
+    <string name="transfer_created">Transfer created</string>
+
+    <!-- Charts -->
+    <string name="chart_title">History</string>
+    <string name="menu_show_chart">Show chart</string>
+    <string name="chart_type_line">Line</string>
+    <string name="chart_type_candle">Candles</string>
+    <string name="chart_interval_day">Day</string>
+    <string name="chart_interval_week">Week</string>
+    <string name="chart_interval_month">Month</string>
+    <string name="chart_balance_label">Balance</string>
+    <string name="chart_mode_total">Total balance (cumulative)</string>
+    <string name="chart_mode_period">Per period (income/expense)</string>
+    <string name="chart_flow_label">Net per period</string>
+    <string name="chart_no_data">No data to chart yet</string>
+    <string name="chart_stats_current">Current balance: %1$s</string>
+    <string name="chart_stats_min_max">Min: %1$s   Max: %2$s</string>
+    <string name="chart_stats_income">Total income: %1$s</string>
+    <string name="chart_stats_expenses">Total expenses: %1$s</string>
+    <string name="chart_stats_net">Net change: %1$s</string>
+    <string name="chart_stats_count">Transactions: %1$d</string>
+
+    <!-- Category multi-select -->
+    <string name="selected_categories_summary">%1$d selected: %2$s</string>
+
+    <!-- Currency conversion (amount-based, rate optional) -->
+    <string name="dialog_convert_title">Different currencies</string>
+    <string name="dialog_convert_message">This account is in %1$s but the category is in %2$s.\nEnter how much the transaction is worth in %2$s.</string>
+    <string name="dialog_convert_amount_label">Amount in %1$s</string>
+    <string name="dialog_convert_use_rate">Enter exchange rate instead</string>
+
 </resources>

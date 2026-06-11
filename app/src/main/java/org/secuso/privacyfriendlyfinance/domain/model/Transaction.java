@@ -40,6 +40,7 @@ import org.secuso.privacyfriendlyfinance.domain.model.common.NameWithIdProvider;
             @Index(value = "categoryId"),
             @Index(value = "accountId"),
             @Index(value = "repeatingId"),
+            @Index(value = "transferId"),
     },
     foreignKeys = {
         @ForeignKey(
@@ -73,6 +74,12 @@ public class Transaction extends AbstractEntity implements NameWithIdProvider {
     private Long defaultAmount;
 
     private Long repeatingId;
+
+    /**
+     * Links the two sides (outgoing + incoming) of an account-to-account transfer.
+     * Both rows of one transfer share the same value. {@code null} for normal transactions.
+     */
+    private Long transferId;
 
     public Transaction() {
     }
@@ -150,6 +157,18 @@ public class Transaction extends AbstractEntity implements NameWithIdProvider {
         this.repeatingId = repeatingId;
     }
 
+    public Long getTransferId() {
+        return transferId;
+    }
+
+    public void setTransferId(Long transferId) {
+        this.transferId = transferId;
+    }
+
+    public boolean isTransfer() {
+        return transferId != null;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Transaction{");
@@ -161,6 +180,7 @@ public class Transaction extends AbstractEntity implements NameWithIdProvider {
         sb.append(", categoryAmount=").append(categoryAmount);
         sb.append(", defaultAmount=").append(defaultAmount);
         sb.append(", repeatingId=").append(repeatingId);
+        sb.append(", transferId=").append(transferId);
         sb.append('}');
         return sb.toString();
     }

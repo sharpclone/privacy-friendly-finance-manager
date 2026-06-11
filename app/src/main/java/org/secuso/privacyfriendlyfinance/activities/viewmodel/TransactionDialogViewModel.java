@@ -316,6 +316,20 @@ public class TransactionDialogViewModel extends CurrencyInputBindableViewModel {
         transaction.setCategoryAmount(categoryAmount);
     }
 
+    /**
+     * Stores the value of this transaction expressed in the category currency directly.
+     * The sign is forced to match the account amount (expense/income) so the magnitude entered
+     * by the user is interpreted correctly regardless of how it was typed.
+     */
+    public void applyCategoryAmount(long magnitudeInCategoryCurrency) {
+        long mag = Math.abs(magnitudeInCategoryCurrency);
+        transaction.setCategoryAmount(transaction.getAmount() < 0 ? -mag : mag);
+    }
+
+    public long getAmountValue() {
+        return transaction.getAmount();
+    }
+
     public void cancel() {
         transaction.setName(originalName);
         transaction.setAccountId(originalAccountId);

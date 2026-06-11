@@ -81,6 +81,9 @@ dependencies {
 
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
+    // Charting (line + candlestick). Offline, no network/trackers. Apache 2.0.
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
     // https://opencsv.sourceforge.net/ License: Appache2 https://opencsv.sourceforge.net/licenses.html
     implementation 'com.opencsv:opencsv:5.7.1'
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/label_convert_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Amount in USD" />
+
+    <EditText
+        android:id="@+id/edit_convert_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/dialog_transaction_value_hint"
+        android:inputType="numberDecimal|numberSigned" />
+
+    <CheckBox
+        android:id="@+id/check_convert_rate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/dialog_convert_use_rate" />
+
+    <LinearLayout
+        android:id="@+id/layout_convert_rate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/label_convert_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="1 EUR = ? USD" />
+
+        <EditText
+            android:id="@+id/edit_convert_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/transfer_rate_field_hint"
+            android:inputType="numberDecimal" />
+    </LinearLayout>
+</LinearLayout>

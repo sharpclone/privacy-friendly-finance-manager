@@ -37,6 +37,7 @@ import org.secuso.privacyfriendlyfinance.csv.CsvImporter;
 import org.secuso.privacyfriendlyfinance.domain.FinanceDatabase;
 import org.secuso.privacyfriendlyfinance.domain.access.TransactionDao;
 import org.secuso.privacyfriendlyfinance.domain.model.Transaction;
+import org.secuso.privacyfriendlyfinance.helpers.SharedPreferencesManager;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -93,11 +94,14 @@ public class CsvImportService extends IntentService {
     }
 
     private String importCsv(InputStream in, FinanceDatabase database) throws Exception {
+        Account2Id account2Id = new Account2Id(database.accountDao());
         CsvImporter importer = new CsvImporter(
                 new InputStreamReader(in),
-                new Account2Id(database.accountDao()),
+                account2Id,
                 new Category2Id(database.categoryDao()));
             List<Transaction> transactions = importer.readFromCsv();
+
+            applyImportedSettings(importer, account2Id);
 
             StringBuilder messageLines = new StringBuilder(importer.getErrors());
 
@@ -119,6 +123,27 @@ public class CsvImportService extends IntentService {
             messageLines.append(getString(R.string.info_import_success,
                 ""+ countImported,"" + transactions.size()));
             return messageLines.toString();
+    }
+
+    /**
+     * Restores the app default currency and each account's currency from the imported CSV.
+     * Account ids are resolved through the same {@link Account2Id} used during import, so accounts
+     * created on demand are matched correctly.
+     */
+    private void applyImportedSettings(CsvImporter importer, Account2Id account2Id) {
+        SharedPreferencesManager prefs = SharedPreferencesManager.get(getApplicationContext());
+
+        String defaultCurrency = importer.getImportedDefaultCurrency();
+        if (defaultCurrency != null && !defaultCurrency.trim().isEmpty()) {
+            prefs.setDefaultCurrencyCode(defaultCurrency.trim());
+        }
+
+        for (java.util.Map.Entry<String, String> entry : importer.getAccountCurrencyByName().entrySet()) {
+            Long accountId = account2Id.get(entry.getKey());
+            if (accountId != null) {
+                prefs.setAccountCurrencyCode(accountId, entry.getValue());
+            }
+        }
     }
 
     public static void close(Closeable stream, Object source) {

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/transfer_from"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_from"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/transfer_to"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/label_sent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Amount sent (EUR)" />
+
+        <EditText
+            android:id="@+id/edit_sent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dialog_transaction_value_hint"
+            android:inputType="numberDecimal|numberSigned"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/layout_received"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/label_received"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Amount received (USD)" />
+
+            <EditText
+                android:id="@+id/edit_received"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/dialog_transaction_value_hint"
+                android:inputType="numberDecimal|numberSigned"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/check_use_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/transfer_use_rate"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layout_rate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/label_rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Rate (1 EUR = ? USD)" />
+
+            <EditText
+                android:id="@+id/edit_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/transfer_rate_field_hint"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="8dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/transfer_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:drawableStart="@drawable/ic_calendar_today_gray_24dp"
+            android:drawablePadding="6dp"
+            android:gravity="center_vertical"
+            tools:text="2026-06-11" />
+
+        <EditText
+            android:id="@+id/edit_transfer_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/transfer_name_hint"
+            android:inputType="text"
+            android:maxLength="32" />
+
+    </LinearLayout>
+</ScrollView>

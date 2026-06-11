@@ -76,7 +76,7 @@ public abstract class TransactionListActivity extends BaseActivity implements On
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
 
-        addFab(R.layout.fab_add, view -> onItemClick(null));
+        addFab(R.layout.fab_add, this::showAddMenu);
 
         recyclerView = binding.recyclerView;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -217,6 +217,23 @@ public abstract class TransactionListActivity extends BaseActivity implements On
         }
         selectionSummaryLayout.setVisibility(View.VISIBLE);
         selectionSummaryText.setText(getString(R.string.selected_transactions_summary, selectedCount, groupedSummary));
+    }
+
+    private void showAddMenu(View anchor) {
+        android.widget.PopupMenu popup = new android.widget.PopupMenu(this, anchor);
+        popup.getMenuInflater().inflate(R.menu.fab_add_menu, popup.getMenu());
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_new_transaction) {
+                onItemClick(null);
+                return true;
+            } else if (item.getItemId() == R.id.action_new_transfer) {
+                org.secuso.privacyfriendlyfinance.activities.dialog.TransferDialog
+                        .showTransferDialog(getSupportFragmentManager());
+                return true;
+            }
+            return false;
+        });
+        popup.show();
     }
 
     @Override

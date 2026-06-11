@@ -31,7 +31,9 @@ import org.secuso.privacyfriendlyfinance.domain.model.common.Name2Id;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class CsvImporter  implements AutoCloseable {
@@ -41,6 +43,8 @@ public class CsvImporter  implements AutoCloseable {
     private Name2Id<?> categoryName2Id;
     private StringBuilder errors;
     private int lineNumber;
+    private final Map<String, String> accountCurrencyByName = new HashMap<>();
+    private String importedDefaultCurrency;
 
     public CsvImporter(Reader csvDataReader, Name2Id<?> accountName2Id, Name2Id<?> categoryName2Id) {
         this.accountName2Id = accountName2Id;
@@ -70,14 +74,22 @@ public class CsvImporter  implements AutoCloseable {
         int columnNoDate = getColumnNo(headers, CsvDefinitions.COLUMN_NAME_DATE);
         int columnNoAccount = getColumnNo(headers, CsvDefinitions.COLUMN_NAME_ACCOUNT);
         int columnNoCategory = getColumnNo(headers, CsvDefinitions.COLUMN_NAME_CATEGORY);
+        int columnNoCurrency = getColumnNo(headers, CsvDefinitions.COLUMN_NAME_CURRENCY);
 
         while ((line = readNextCsvColumnLine()) != null) {
             try {
+                String accountStr = getColumnContent(line, columnNoAccount);
+                String currencyStr = getColumnContent(line, columnNoCurrency);
+                if (accountStr != null && !accountStr.isEmpty()
+                        && currencyStr != null && !currencyStr.trim().isEmpty()) {
+                    accountCurrencyByName.put(accountStr, currencyStr.trim());
+                }
+
                 Transaction tr = createTransaction(
                         getColumnContent(line, columnNoNote),
                         getColumnContent(line, columnNoAmount),
                         getColumnContent(line, columnNoDate),
-                        getColumnContent(line, columnNoAccount),
+                        accountStr,
                         getColumnContent(line, columnNoCategory));
 
                 list.add(tr);
@@ -94,8 +106,20 @@ public class CsvImporter  implements AutoCloseable {
         do {
             lineNumber++;
             columns = csvReader.readNext();
+            if (columns != null && columns.length >= 2
+                    && CsvDefinitions.META_DEFAULT_CURRENCY.equals(columns[0].trim())) {
+                importedDefaultCurrency = columns[1].trim();
+            }
         } while (columns != null && isComment(columns));
         return columns;
+    }
+
+    public String getImportedDefaultCurrency() {
+        return importedDefaultCurrency;
+    }
+
+    public Map<String, String> getAccountCurrencyByName() {
+        return accountCurrencyByName;
     }
 
     // " ; ;; "

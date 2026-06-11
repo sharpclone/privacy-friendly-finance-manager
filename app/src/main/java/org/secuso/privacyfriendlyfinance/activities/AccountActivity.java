@@ -18,7 +18,9 @@
 
 package org.secuso.privacyfriendlyfinance.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -115,6 +117,27 @@ public class AccountActivity extends TransactionListActivity {
                 viewModel.getAccount().getValue(),
                 viewModel.getMonthBalance().getValue(),
                 getSupportFragmentManager());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.chart_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.toolbar_action_chart) {
+            Intent intent = new Intent(this, ChartActivity.class);
+            intent.putExtra(ChartActivity.EXTRA_ENTITY_TYPE, ChartActivity.TYPE_ACCOUNT);
+            intent.putExtra(ChartActivity.EXTRA_ENTITY_ID, getIntent().getLongExtra(EXTRA_ACCOUNT_ID, -1));
+            Account account = viewModel.getAccount().getValue();
+            intent.putExtra(ChartActivity.EXTRA_TITLE, account != null ? account.getName() : null);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

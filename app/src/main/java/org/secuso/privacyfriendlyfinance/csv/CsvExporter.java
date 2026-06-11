@@ -30,6 +30,7 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Map;
 
 /**
  * converts (list of) {@link Transaction} items to csv format used for export.
@@ -38,12 +39,21 @@ public class CsvExporter implements AutoCloseable {
     public static DecimalFormat df = new DecimalFormat("0.00");
     private final Id2Name<?> id2Category;
     private final Id2Name<?> id2Account;
+    private final Map<Long, String> accountCurrencyById;
+    private final String defaultCurrency;
 
     ICSVWriter csvWriter;
 
     public CsvExporter(Writer resultWriter, Id2Name<?> id2Category, Id2Name<?> id2Account) {
+        this(resultWriter, id2Category, id2Account, null, null);
+    }
+
+    public CsvExporter(Writer resultWriter, Id2Name<?> id2Category, Id2Name<?> id2Account,
+                       Map<Long, String> accountCurrencyById, String defaultCurrency) {
         this.id2Category = id2Category;
         this.id2Account = id2Account;
+        this.accountCurrencyById = accountCurrencyById;
+        this.defaultCurrency = defaultCurrency;
 
         csvWriter = new CSVWriterBuilder(resultWriter)
                 .withSeparator(CsvDefinitions.CSV_FIELD_DELIMITER_CHAR)
@@ -52,13 +62,22 @@ public class CsvExporter implements AutoCloseable {
         setDecimalFormat();
     }
 
+    private String currencyOf(Transaction transaction) {
+        if (accountCurrencyById != null) {
+            String code = accountCurrencyById.get(transaction.getAccountId());
+            if (code != null) return code;
+        }
+        return defaultCurrency;
+    }
+
     public void writeCsvLine(Transaction transaction) {
         writeCsvLine(
                 toString(transaction.getDate()),
                 toString(df.format((transaction.getAmount()) / 100.0)),
                 toString(transaction.getName()),
                 toString(id2Category.get(transaction.getCategoryId())),
-                toString(id2Account.get(transaction.getAccountId())));
+                toString(id2Account.get(transaction.getAccountId())),
+                toString(currencyOf(transaction)));
     }
 
     private void setDecimalFormat() {
@@ -79,6 +98,10 @@ public class CsvExporter implements AutoCloseable {
     }
 
     public void writeTransactions(List<Transaction> transactions) {
+        if (defaultCurrency != null) {
+            // App-global setting, written as a comment line so older importers ignore it.
+            writeCsvLine(CsvDefinitions.META_DEFAULT_CURRENCY, defaultCurrency);
+        }
         writeCsvHeader();
 
         for(int x = 0; x < transactions.size(); x++) {

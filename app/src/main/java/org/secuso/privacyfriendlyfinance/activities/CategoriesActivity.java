@@ -23,6 +23,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +61,8 @@ public class CategoriesActivity extends BaseActivity implements OnItemClickListe
     private TextView emptyView;
     private CategoriesViewModel viewModel;
     private SwipeController swipeController = null;
+    private LinearLayout selectionSummaryLayout;
+    private TextView selectionSummaryText;
 
 
     @Override
@@ -70,11 +74,21 @@ public class CategoriesActivity extends BaseActivity implements OnItemClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContent(R.layout.content_recycler);
+        setContent(R.layout.content_categories);
 
         viewModel = (CategoriesViewModel) super.viewModel;
         categoriesAdapter = new CategoriesAdapter(this, viewModel.getCategories());
-        categoriesAdapter.onItemClick(this);
+        categoriesAdapter.setListener(new CategoriesAdapter.CategoryUiListener() {
+            @Override
+            public void onOpen(CategoryWrapper wrapper) {
+                onItemClick(wrapper);
+            }
+
+            @Override
+            public void onSelectionChanged(int selectedCount, String groupedSummary) {
+                updateSelectionSummary(selectedCount, groupedSummary);
+            }
+        });
 
         addFab(R.layout.fab_add, new View.OnClickListener() {
             @Override
@@ -88,6 +102,11 @@ public class CategoriesActivity extends BaseActivity implements OnItemClickListe
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(categoriesAdapter);
+
+        selectionSummaryLayout = findViewById(R.id.layout_selection_summary);
+        selectionSummaryText = findViewById(R.id.text_selected_summary);
+        Button clearSelectionButton = findViewById(R.id.button_clear_selection);
+        clearSelectionButton.setOnClickListener(v -> categoriesAdapter.clearSelection());
 
         emptyView = findViewById(R.id.empty_view);
         emptyView.setText(getString(R.string.activity_categories_empty_list_label));
@@ -143,6 +162,15 @@ public class CategoriesActivity extends BaseActivity implements OnItemClickListe
 
     private void openCategoryDialog(Category category) {
         CategoryDialog.showCategoryDialog(category, getSupportFragmentManager());
+    }
+
+    private void updateSelectionSummary(int selectedCount, String groupedSummary) {
+        if (selectedCount <= 0) {
+            selectionSummaryLayout.setVisibility(View.GONE);
+            return;
+        }
+        selectionSummaryLayout.setVisibility(View.VISIBLE);
+        selectionSummaryText.setText(getString(R.string.selected_categories_summary, selectedCount, groupedSummary));
     }
 
     @Override

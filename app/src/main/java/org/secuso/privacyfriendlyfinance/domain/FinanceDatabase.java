@@ -26,6 +26,8 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabaseHook;
@@ -58,7 +60,7 @@ import java.io.File;
 @Database(
         entities = {Account.class, Category.class, Transaction.class, RepeatingTransaction.class},
         exportSchema = false,
-        version = 11
+        version = 12
 )
 @TypeConverters({LocalDateConverter.class})
 public abstract class FinanceDatabase extends RoomDatabase {
@@ -69,6 +71,18 @@ public abstract class FinanceDatabase extends RoomDatabase {
 
     public static final String DB_NAME = "encryptedDB";
     public static final String KEY_ALIAS = "financeDatabaseKey";
+
+    /**
+     * Adds the {@code transferId} column (and its index) used to link the two rows of an
+     * account-to-account transfer. Preserves all existing data.
+     */
+    static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Tranzaction ADD COLUMN transferId INTEGER");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_Tranzaction_transferId ON Tranzaction (transferId)");
+        }
+    };
 
     public abstract TransactionDao transactionDao();
 
@@ -138,6 +152,7 @@ public abstract class FinanceDatabase extends RoomDatabase {
                         database.rawExecSQL("PRAGMA cipher_compatibility = 3;");
                     }
                 }))
+                .addMigrations(MIGRATION_11_12)
                 .fallbackToDestructiveMigration()
                 .build();
 

@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -292,28 +293,55 @@ public class TransactionDialog extends AppCompatDialogFragment {
             return;
         }
 
-        AlertDialog.Builder promptBuilder = new AlertDialog.Builder(getActivity());
-        promptBuilder.setTitle(R.string.dialog_exchange_rate_title);
+        // Default workflow: ask for the value in the category currency directly (no rate lookup
+        // needed). Entering an exchange rate is offered as an alternative.
+        View convertView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_convert, null, false);
+        TextView labelAmount = convertView.findViewById(R.id.label_convert_amount);
+        EditText editAmount = convertView.findViewById(R.id.edit_convert_amount);
+        CheckBox checkRate = convertView.findViewById(R.id.check_convert_rate);
+        View layoutRate = convertView.findViewById(R.id.layout_convert_rate);
+        TextView labelRate = convertView.findViewById(R.id.label_convert_rate);
+        EditText editRate = convertView.findViewById(R.id.edit_convert_rate);
 
-        final EditText input = new EditText(getContext());
-        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        input.setHint(getString(R.string.dialog_exchange_rate_hint, accountCurrency, categoryCurrency));
-        promptBuilder.setView(input);
-        promptBuilder.setMessage(getString(R.string.dialog_exchange_rate_message, accountCurrency, categoryCurrency));
+        labelAmount.setText(getString(R.string.dialog_convert_amount_label, categoryCurrency));
+        labelRate.setText(getString(R.string.dialog_exchange_rate_hint, accountCurrency, categoryCurrency));
+        editAmount.setFilters(new InputFilter[]{new CurrencyInputFilter()});
+        // Pre-fill with the magnitude of the account amount as a starting point.
+        editAmount.setText(org.secuso.privacyfriendlyfinance.helpers.CurrencyHelper
+                .convertToString(Math.abs(viewModel.getAmountValue())));
 
-        promptBuilder.setNegativeButton(R.string.cancel, null);
-        promptBuilder.setPositiveButton(R.string.submit, (dialog, which) -> {
-            Double rate = null;
-            try {
-                rate = Double.parseDouble(input.getText().toString().replace(',', '.'));
-            } catch (NumberFormatException ignored) {
-            }
-            if (rate == null || rate <= 0) {
-                return;
-            }
-            viewModel.applyExchangeRate(rate);
-            viewModel.submit();
+        checkRate.setOnCheckedChangeListener((b, checked) -> {
+            layoutRate.setVisibility(checked ? View.VISIBLE : View.GONE);
+            editAmount.setEnabled(!checked);
         });
-        promptBuilder.show();
+
+        AlertDialog.Builder promptBuilder = new AlertDialog.Builder(getActivity());
+        promptBuilder.setTitle(R.string.dialog_convert_title);
+        promptBuilder.setMessage(getString(R.string.dialog_convert_message, accountCurrency, categoryCurrency));
+        promptBuilder.setView(convertView);
+        promptBuilder.setNegativeButton(R.string.cancel, null);
+        promptBuilder.setPositiveButton(R.string.submit, null);
+
+        AlertDialog convertDialog = promptBuilder.create();
+        convertDialog.setOnShowListener(d ->
+                convertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    if (checkRate.isChecked()) {
+                        Double rate = null;
+                        try {
+                            rate = Double.parseDouble(editRate.getText().toString().replace(',', '.'));
+                        } catch (NumberFormatException ignored) {
+                        }
+                        if (rate == null || rate <= 0) return;
+                        viewModel.applyExchangeRate(rate);
+                    } else {
+                        Long categoryAmount = org.secuso.privacyfriendlyfinance.helpers.CurrencyHelper
+                                .convertToLong(editAmount.getText().toString());
+                        if (categoryAmount == null) return;
+                        viewModel.applyCategoryAmount(categoryAmount);
+                    }
+                    viewModel.submit();
+                    convertDialog.dismiss();
+                }));
+        convertDialog.show();
     }
 }

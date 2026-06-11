@@ -18,7 +18,9 @@
 
 package org.secuso.privacyfriendlyfinance.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -150,6 +152,27 @@ public class CategoryActivity extends TransactionListActivity {
 
     private void openCategoryDialog() {
         CategoryDialog.showCategoryDialog(viewModel.getCategory().getValue(), getSupportFragmentManager());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.chart_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.toolbar_action_chart) {
+            Intent intent = new Intent(this, ChartActivity.class);
+            intent.putExtra(ChartActivity.EXTRA_ENTITY_TYPE, ChartActivity.TYPE_CATEGORY);
+            intent.putExtra(ChartActivity.EXTRA_ENTITY_ID, getIntent().getLongExtra(EXTRA_CATEGORY_ID, -1));
+            Category category = viewModel.getCategory().getValue();
+            intent.putExtra(ChartActivity.EXTRA_TITLE, category != null ? category.getName() : null);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
